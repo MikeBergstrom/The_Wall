@@ -1,0 +1,21 @@
+#login{
+    border: 1px solid black;
+    width: 200px;
+    height: 200px;
+    display: inline-block;
+
+}
+#register{
+    border: 1px solid black;
+    width: 250px;
+    height: 400px;
+    display: inline-block;
+    vertical-align: top;
+}
+#register input{
+    display: block;
+}
+header{
+    border-bottom: 3px solid black;
+    margin-bottom: 15px;
+}
