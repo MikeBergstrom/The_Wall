@@ -30,13 +30,13 @@ h1{
 h3 {
     display: inline-block;
     margin-left: 700px;
-    vertical-align: top;
+
 }
 #logout {
     width: 100px;
     height: 25px;
     vertical-align: top;
-    margin-top: 20px;
+    margin-top: 15px;
     display: inline-block;
 }
 .comment{

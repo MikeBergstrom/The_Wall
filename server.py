@@ -116,4 +116,30 @@ def comment():
     mysql.query_db(query,data)
     return redirect('/wall')
 
+@app.route('/delete', methods=['POST'])
+def delete():
+    print request.form
+    query ="SELECT user_id, created_at FROM messages WHERE id= :message_id"
+    data = {
+        "message_id":request.form['messageid']
+    }
+    user_id = mysql.query_db(query, data)
+    print user_id
+    if user_id[0]['user_id'] != session['id']:
+        flash("Messages can only be deleted by user that created them")
+    else:  
+        query1 = "DELETE FROM comments WHERE message_id = :message_id"
+        query2 = "DELETE FROM messages WHERE id = :message_id AND user_id = :user_id"
+        data2 = {
+            "message_id": request.form['messageid']
+        }
+        data3 = {
+            "message_id": request.form['messageid'],
+            "user_id": session['id']
+        }
+        mysql.query_db(query1, data2)
+        mysql.query_db(query2,data3)
+
+    return redirect('/wall')   
+
 app.run(debug=True)
