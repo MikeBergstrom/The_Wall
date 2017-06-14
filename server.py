@@ -2,6 +2,7 @@ from flask import Flask, request, redirect, render_template, session, flash
 from mysqlconnection import MySQLConnector
 import re
 import md5
+import datetime
 app = Flask(__name__)
 app.secret_key='secrets'
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
@@ -127,6 +128,8 @@ def delete():
     print user_id
     if user_id[0]['user_id'] != session['id']:
         flash("Messages can only be deleted by user that created them")
+    elif user_id[0]['created_at'] < datetime.datetime.now() - datetime.timedelta(minutes=-30):
+        flash("Message must have been created in the last 30 minutes") 
     else:  
         query1 = "DELETE FROM comments WHERE message_id = :message_id"
         query2 = "DELETE FROM messages WHERE id = :message_id AND user_id = :user_id"
