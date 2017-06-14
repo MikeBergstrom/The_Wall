@@ -66,7 +66,7 @@ def login():
         session['email'] = request.form['email']
         return redirect('/wall')
     else:
-        flash ("username or password incorrect")
+        flash ("**Username or Password is Incorrect**")
         return redirect('/fail')
 
 @app.route('/wall')
@@ -74,12 +74,46 @@ def success():
     query ="SELECT id, first_name, last_name FROM users WHERE email = :email LIMIT 1"
     data = { 'email' : session['email']}
     user = mysql.query_db(query, data)
-    print session['email']
-    print user
-    return render_template('success.html', user=user)
+    session['id'] = user[0]['id']
+    # print session['id']
+    # print session['email']
+    # print user
+    querymess = "SELECT messages.id, users.first_name, users.last_name, messages.message, DATE_FORMAT(messages.created_At, '%M %D %Y') as message_date FROM messages JOIN users ON messages.user_id = users.id"
+    messages = mysql.query_db(querymess)
+    # print messages
+    querycomm = "SELECT comments.message_id, users.first_name, users.last_name, comments.comment, DATE_FORMAT(comments.created_at, '%M %D %Y') as comment_date FROM comments JOIN users ON comments.user_id = users.id"
+    comments = mysql.query_db(querycomm)
+    # print comments
+    return render_template('wall.html', user=user, comments=comments, messages=messages)
 
 @app.route('/fail')
 def fail():
     return render_template('fail.html')
+
+@app.route('/logout')
+def logout():
+    session['email'] = ""
+    return redirect ('/')
+
+@app.route('/message', methods=['POST'])
+def message():
+    query = "INSERT INTO messages (message, user_id, created_at, updated_at) VALUES (:message, :id, NOW(), NOW())"
+    data = {
+        "message": request.form['message'],
+        "id": session['id']
+    }
+    mysql.query_db(query, data)
+    return redirect('/wall')
+@app.route('/comment', methods=['POST'])
+def comment():
+    print request.form['messageid']
+    query = "INSERT INTO comments (comment, message_id, user_id, created_at, updated_at) VALUES (:comment, :message_id, :user_id, NOW(), NOW())"
+    data = {
+        "comment": request.form['comment'],
+        "message_id": request.form['messageid'],
+        "user_id": session['id']
+    }
+    mysql.query_db(query,data)
+    return redirect('/wall')
 
 app.run(debug=True)
